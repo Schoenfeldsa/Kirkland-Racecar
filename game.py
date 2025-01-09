@@ -6,12 +6,7 @@ pygame.init()
 width = 800
 height = 600
 
-
 # def is_touching(object_1_dimensions, object_2_dimensions):
-    
-
-
-
 
 
 screen = pygame.display.set_mode((width, height))
