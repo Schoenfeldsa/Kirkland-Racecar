@@ -129,7 +129,7 @@ while running:
     #         pylon_pos = [road_x + lane_width * random.randint(0, 2) + (lane_width - pylon.get_width()) // 2, 0]
     else:
         display_game_over()
-        if keys[pygame.K_0]:
+        if keys[pygame.K_RETURN]:
             game_over = False
             car_pos = [(width // 2) - car_width // 2, height - car_height]
             cones = []
