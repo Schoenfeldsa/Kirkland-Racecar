@@ -198,7 +198,7 @@ text_box_rect = pygame.Rect(screen_width - side_box_width, 0, side_box_width, sc
 
 def display_text(text):
     text_surface = font.render(text, True, TEXT_COLOR)
-    screen.blit(text_surface, (screen_width - side_box_width + 10, 10))
+    screen.blit(text_surface, (0, 10))
 
 # Game state
 running = True
@@ -245,7 +245,9 @@ while running:
 
                 encoded_state = encode_state(state)
                 ai_action = greedy_policy(trained_q_table, encoded_state)
-                
+                rounded_q_values = np.round(trained_q_table[encoded_state], decimals = 2)
+                display_text(str(rounded_q_values))
+
                 new_state, reward = run_tick(ai_action, state)
 
                 total_reward += reward
