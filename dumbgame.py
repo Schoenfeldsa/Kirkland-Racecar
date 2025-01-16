@@ -63,7 +63,7 @@ def greedy_policy(q_table, state):
   Used when the q_table is done training
   """ 
   action = np.argmax(q_table[state])
-  return action
+  return int(action)
 
 
 def run_tick(action, state):
@@ -282,8 +282,9 @@ while running:
 
                 total_reward += reward
                 row4 = state[3]
-                state = new_state
                 draw_stats(ai_action, state, rounded_q_values)
+                state = new_state
+                
 
                 pygame.display.flip()
                 pygame.time.wait(100) 
