@@ -154,11 +154,15 @@ trained_q_table = train(n_episodes, min_epsilon, max_epsilon, decay_rate, max_st
 pygame.init() 
 
 # Screen dimensions
-screen_width = 300
+screen_width = 700
 screen_height = 400
+stats_width = 400
+board_width = 300
+board_height = 400
 board_rows = 4
 board_cols = 3
-row_height = screen_height // board_rows
+row_height = board_height // board_rows
+
 
 # Screen setup
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -171,13 +175,16 @@ pylon_image = pygame.image.load('traffic_cone.png')
 # Scale images
 car_image = pygame.transform.scale(car_image, (car_image.get_width() // 2, car_image.get_height() // 2))
 pylon_image = pygame.transform.scale(pylon_image, (pylon_image.get_width() // 20, pylon_image.get_height() // 20))
+print(car_image.get_height)
+print(car_image.get_width)
+
 
 # Game variables
 board = np.zeros((board_rows, board_cols))
 BLACK = (0, 0, 0)
 road_color = (55, 55, 55)
 road_width = 300
-road_x = (screen_width - road_width) // 2
+road_x = (board_width - road_width) // 2
 lane_width = road_width / 3
 lane_positions = [road_x, road_x + lane_width, road_x + 2 * lane_width]
 car_width = car_image.get_width()
@@ -194,7 +201,7 @@ TEXT_COLOR = (255, 255, 255)
 
 font = pygame.font.SysFont('Arial', 30)
 
-text_box_rect = pygame.Rect(screen_width - side_box_width, 0, side_box_width, screen_height)
+text_box_rect = pygame.Rect(board_width - side_box_width, 0, side_box_width, board_height)
 
 def display_text(text):
     text_surface = font.render(text, True, TEXT_COLOR)
@@ -205,13 +212,35 @@ running = True
 turn_progressed = False
 
 def draw_grid():
-    screen.fill((124, 252, 0))  # Grass background
-    pygame.draw.rect(screen, road_color, (road_x, 0, road_width, screen_height))  # Road
+    screen.fill((0, 0, 0))  # Grass background
+    pygame.draw.rect(screen, road_color, (road_x, 0, road_width, board_height))  # Road
     for x in range(1, board_cols):
-        pygame.draw.line(screen, BLACK, (road_x + x * lane_width, 0), (road_x + x * lane_width, screen_height), 2)
+        pygame.draw.line(screen, BLACK, (road_x + x * lane_width, 0), (road_x + x * lane_width, board_height), 2)
     for y in range(1, board_rows):
-        pygame.draw.line(screen, BLACK, (road_x, y * (screen_height // board_rows)), 
-                         (road_x + road_width, y * (screen_height // board_rows)), 2)
+        pygame.draw.line(screen, BLACK, (road_x, y * (board_height // board_rows)), 
+                         (road_x + road_width, y * (board_height // board_rows)), 2)
+
+def draw_stats(ai_action, state, q_value):
+    pygame.draw.rect(screen, (50, 50, 50), (board_width, 0, stats_width, board_height))
+    stats_title = font.render("Statistics", True, (255, 255, 255))
+    screen.blit(stats_title, (board_width + 20, 20))
+
+    if ai_action == 0:
+       ai_action = "Left"
+    elif ai_action == 1:
+       ai_action = "Stay"
+    elif ai_action == 2:
+       ai_action = "Right"
+
+    stat_1_label = font.render("Next AI action:" + str(ai_action), True, (255, 255, 255))
+    stat_2_label = font.render("State:" + str(state), True, (255, 255, 255))
+    stat_3_label = font.render("Q-values:" + str(q_value), True, (255, 255, 255))
+
+    screen.blit(stat_1_label, (board_width + 20, 60))
+    screen.blit(stat_2_label, (board_width + 20, 100))
+    screen.blit(stat_3_label, (board_width + 20, 140))
+   
+   
 
 def draw_pylons(state, row4):
    rows = state[1:] + [row4]
@@ -225,7 +254,7 @@ def draw_pylons(state, row4):
 
 
 def draw_car(state):
-   car_pos = [lane_positions[state[0]], screen_height - car_height - 10]
+   car_pos = [lane_positions[state[0]], board_height - car_height - 10]
    screen.blit(car_image, car_pos)
 
 
@@ -246,13 +275,15 @@ while running:
                 encoded_state = encode_state(state)
                 ai_action = greedy_policy(trained_q_table, encoded_state)
                 rounded_q_values = np.round(trained_q_table[encoded_state], decimals = 2)
-                display_text(str(rounded_q_values))
+                # display_text(str(rounded_q_values))
+            
 
                 new_state, reward = run_tick(ai_action, state)
 
                 total_reward += reward
                 row4 = state[3]
                 state = new_state
+                draw_stats(ai_action, state, rounded_q_values)
 
                 pygame.display.flip()
                 pygame.time.wait(100) 
