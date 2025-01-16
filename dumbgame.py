@@ -212,7 +212,7 @@ running = True
 turn_progressed = False
 
 def draw_grid():
-    screen.fill((0, 0, 0))  # Grass background
+    screen.fill((0, 0, 0))  # black background
     pygame.draw.rect(screen, road_color, (road_x, 0, road_width, board_height))  # Road
     for x in range(1, board_cols):
         pygame.draw.line(screen, BLACK, (road_x + x * lane_width, 0), (road_x + x * lane_width, board_height), 2)
